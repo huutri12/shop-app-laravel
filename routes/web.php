@@ -7,12 +7,17 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Frontend\MemberController;
 use App\Http\Controllers\Frontend\BlogMemberController;
 use App\Http\Controllers\Frontend\AccountController;
+use App\Http\Controllers\Frontend\ProductController;
+
 
 // Admin Controllers
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\BrandController;
+
 
 /* FRONTEND ROUTES (Member side) */
 
@@ -53,18 +58,20 @@ Route::middleware('auth')
     ->name('account.')
     ->group(function () {
 
+        // Profile
         Route::get('/update', [AccountController::class, 'edit'])->name('update');
         Route::post('/update', [AccountController::class, 'update'])->name('update.post');
 
-        Route::get('/my-product', [AccountController::class, 'myProducts'])->name('my-product');
-        Route::get('/add-product', [AccountController::class, 'createProduct'])->name('add-product');
-        Route::post('/add-product', [AccountController::class, 'storeProduct'])->name('store-product');
+        // Product
+        Route::get('/my-product',        [ProductController::class, 'index'])->name('my-product');
+        Route::get('/add-product',       [ProductController::class, 'create'])->name('add-product');
+        Route::post('/add-product',      [ProductController::class, 'store'])->name('add-product.post');
 
-        Route::get('/product/{id}/edit', [AccountController::class, 'editProduct'])->name('edit-product');
-        Route::post('/product/{id}/update', [AccountController::class, 'updateProduct'])->name('update-product');
-        Route::get('/product/{id}/delete', [AccountController::class, 'destroyProduct'])->name('delete-product');
+        Route::get('/product/{id}/edit',    [ProductController::class, 'edit'])->name('edit-product');
+        Route::post('/product/{id}/update', [ProductController::class, 'update'])->name('update-product');
+        Route::delete('/product/{id}',      [ProductController::class, 'destroy'])->name('delete-product');
+        
     });
-
 
 Auth::routes();
 
@@ -87,7 +94,7 @@ Route::middleware(['auth', 'admin'])
 
         /*
         |--------------------------------------------------------------------------
-        | COUNTRY MANAGEMENT
+        | COUNTRY 
         |--------------------------------------------------------------------------
         */
         Route::prefix('country')->name('country.')->group(function () {
@@ -101,7 +108,7 @@ Route::middleware(['auth', 'admin'])
 
         /*
         |--------------------------------------------------------------------------
-        | BLOG MANAGEMENT (Admin)
+        | BLOG  (Admin)
         |--------------------------------------------------------------------------
         */
         Route::prefix('blog')->name('blog.')->group(function () {
@@ -111,5 +118,35 @@ Route::middleware(['auth', 'admin'])
             Route::get('/edit/{id}', [BlogController::class, 'edit'])->name('edit');
             Route::post('/update/{id}', [BlogController::class, 'update'])->name('update');
             Route::get('/delete/{id}', [BlogController::class, 'destroy'])->name('delete');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Category  (Admin)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::prefix('category')->name('category.')->group(function () {
+            Route::get('/',            [CategoryController::class, 'index'])->name('index');
+            Route::get('/create',      [CategoryController::class, 'create'])->name('create');
+            Route::post('/store',      [CategoryController::class, 'store'])->name('store');
+            Route::get('/edit/{id}',   [CategoryController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [CategoryController::class, 'update'])->name('update');
+            Route::get('/delete/{id}', [CategoryController::class, 'destroy'])->name('delete');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Brand  (Admin)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::prefix('brand')->name('brand.')->group(function () {
+            Route::get('/',            [BrandController::class, 'index'])->name('index');
+            Route::get('/create',      [BrandController::class, 'create'])->name('create');
+            Route::post('/store',      [BrandController::class, 'store'])->name('store');
+            Route::get('/edit/{id}',   [BrandController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [BrandController::class, 'update'])->name('update');
+            Route::get('/delete/{id}', [BrandController::class, 'destroy'])->name('delete');
         });
     });

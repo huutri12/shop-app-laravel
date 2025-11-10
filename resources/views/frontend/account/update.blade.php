@@ -22,8 +22,16 @@
     <input class="form-control mb-2" name="email" value="{{ old('email',$user->email) }}" placeholder="Email">
     <input class="form-control mb-2" type="password" name="password" placeholder="New password (optional)">
     <input class="form-control mb-2" type="password" name="password_confirmation" placeholder="Confirm password">
-    <input class="form-control mb-2" name="city" value="{{ old('city',$user->city) }}" placeholder="City">
-    <input class="form-control mb-2" name="country" value="{{ old('country',$user->country) }}" placeholder="Country">
+    <input class="form-control mb-2" name="address" value="{{ old('address',$user->address) }}" placeholder="City">
+    <select name="id_country" class="form-control">
+      @foreach($countries as $country)
+      <option value="{{ $country->id }}"
+        {{ old('id_country', $user->id_country) == $country->id ? 'selected' : '' }}>
+        {{ $country->name }}
+      </option>
+      @endforeach
+    </select>
+
     <input class="form-control mb-2" name="phone" value="{{ old('phone',$user->phone) }}" placeholder="Phone">
     <input class="form-control mb-2" type="file" name="avatar">
 

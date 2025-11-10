@@ -22,9 +22,15 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image|max:2048',
+            'name'        => 'required|string|max:255',
+            'price'       => 'required|numeric|min:0',
+            'id_category' => 'required|exists:categories,id',
+            'id_brand'    => 'required|exists:brands,id',
+            'status'      => 'required|in:0,1',
+            'sale'        => 'nullable|required_if:status,1|integer|min:1|max:99',
+            'company'     => 'nullable|string|max:255',
+            'detail'      => 'nullable|string',
+            'images.*'    => 'nullable|image|max:1024',  // < 1MB/ảnh
         ];
     }
 
@@ -34,6 +40,8 @@ class ProductRequest extends FormRequest
             'name.required' => 'Tên sản phẩm không được để trống.',
             'price.required' => 'Giá sản phẩm bắt buộc nhập.',
             'price.numeric' => 'Giá sản phẩm phải là số.',
+            'images.*.image' => 'File phải là hình ảnh',
+            'images.*.max'   => 'Mỗi ảnh tối đa 1MB',
         ];
     }
 }

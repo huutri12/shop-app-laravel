@@ -26,7 +26,7 @@ class UpdateProfileRequest extends FormRequest
             'email'      => ['required', 'email'],
             'phone'      => ['nullable', 'string', 'max:50'],
             'address'    => ['nullable', 'string', 'max:255'],
-            'id_country' => ['nullable', 'integer', 'exists:countries,id'],
+            'id_country' => ['required', 'integer', 'exists:countries,id'],
             'password'   => ['nullable', 'string', 'min:8'],
             'avatar'     => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:1024'],
         ];
