@@ -28,12 +28,6 @@ class Product extends Model
         return json_decode($raw, true) ?: [];
     }
 
-    public function getThumbAttribute(): ?string
-    {
-        $imgs = $this->images;
-        return $imgs[0] ?? null;
-    }
-
     public function category()
     {
         return $this->belongsTo(Category::class, 'id_category');

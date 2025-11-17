@@ -18,7 +18,7 @@
         <tr>
             <th>Id</th>
             <th>Name</th>
-            <th>Image</th>
+            <th>Image(s)</th>
             <th>Price</th>
             <th>Action</th>
         </tr>
@@ -26,15 +26,18 @@
     <tbody>
         @foreach($products as $p)
         @php
-        $thumb = $p->thumb; // tên file đầu
+
+        $images = json_decode($p->image, true) ?? [];
         @endphp
         <tr>
             <td>{{ $p->id }}</td>
             <td>{{ $p->name }}</td>
             <td>
-                @if($thumb)
-                <img src="{{ asset('upload/products/'.auth()->id().'/85x84_'.$thumb) }}" width="60">
-                @endif
+                @foreach($images as $img)
+                <img src="{{ asset('upload/products/'.auth()->id().'/85x84_'.$img) }}"
+                    width="60"
+                    style="margin-right:4px; margin-bottom:3px;">
+                @endforeach
             </td>
             <td>${{ number_format($p->price, 2) }}</td>
             <td>
