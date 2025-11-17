@@ -10,7 +10,7 @@
     </div>
 
     <div class="panel panel-default">
-      <div class="panel-heading {{ request()->routeIs('account.my-product*') ? 'active' : '' }}">
+      <div class="panel-heading {{ request()->routeIs('product.index*') ? 'active' : '' }}">
         <h4 class="panel-title">
           <a href="{{ route('account.my-product') }}">My Product</a>
         </h4>

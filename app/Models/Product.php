@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+   
+    protected $table = 'product';   
+
     protected $fillable = [
         'id_user',
         'name',
@@ -19,14 +22,12 @@ class Product extends Model
         'detail'
     ];
 
-
     public function getImagesAttribute(): array
     {
         $raw = $this->attributes['image'] ?? '[]';
         return json_decode($raw, true) ?: [];
     }
 
-   
     public function getThumbAttribute(): ?string
     {
         $imgs = $this->images;
@@ -37,10 +38,12 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class, 'id_category');
     }
+
     public function brand()
     {
         return $this->belongsTo(Brand::class, 'id_brand');
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');

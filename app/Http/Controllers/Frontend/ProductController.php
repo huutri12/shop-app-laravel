@@ -9,14 +9,11 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Facades\Image;
 
 class ProductController extends Controller
 {
-    /**
-     * GET /account/my-product
-     * Danh sách sản phẩm của member hiện tại
-     */
+    // GET /account/my-product
     public function index()
     {
         $userId = Auth::id();
@@ -28,10 +25,7 @@ class ProductController extends Controller
         return view('frontend.product.index', compact('products'));
     }
 
-    /**
-     * GET /account/add-product
-     * Form tạo sản phẩm
-     */
+    // GET /account/add-product
     public function create()
     {
         $categories = Category::where('status', 1)->orderBy('name')->get();
@@ -40,25 +34,23 @@ class ProductController extends Controller
         return view('frontend.product.create', compact('categories', 'brands'));
     }
 
-    /**
-     * POST /account/add-product
-     * Lưu sản phẩm mới
-     */
+    // POST /account/add-product
     public function store(ProductRequest $request)
     {
-        $user       = Auth::user();
-        $data       = $request->validated();
+        $user = Auth::user();
+
+        $data = $request->validated();
         $data['id_user'] = $user->id;
 
-       
-        if ((int) $data['status'] === 0) {
+        if ((int)($data['status'] ?? 0) === 0) {
             $data['sale'] = 0;
         }
 
         $files = $request->file('images', []);
+
         if (count($files) === 0) {
             return back()
-                ->withErrors(['images' => 'Vui lòng chọn ít nhất 1 hình'])
+                ->withErrors(['images' => 'Vui lòng chọn ít nhất 1 hình.'])
                 ->withInput();
         }
 
@@ -81,23 +73,26 @@ class ProductController extends Controller
             }
 
             $ext      = $file->getClientOriginalExtension();
-            $baseName = time() . '_' . Str::random(8) . '.' . $ext;
+            $baseName = uniqid() . '_' . Str::random(6) . '.' . $ext;
 
-            // Lưu full
             $file->move($basePath, $baseName);
             $fullPath = $basePath . '/' . $baseName;
 
-            // 85x84
-            Image::read($fullPath)
-                ->cover(85, 84)
+            Image::make($fullPath)
+                ->fit(85, 84)
                 ->save($basePath . '/85x84_' . $baseName);
 
-            // 329x380
-            Image::read($fullPath)
-                ->cover(329, 380)
+            Image::make($fullPath)
+                ->fit(329, 380)
                 ->save($basePath . '/329x380_' . $baseName);
 
             $filenames[] = $baseName;
+        }
+
+        if (empty($filenames)) {
+            return back()
+                ->withErrors(['images' => 'Upload hình thất bại.'])
+                ->withInput();
         }
 
         $data['image'] = json_encode($filenames);
@@ -107,16 +102,5 @@ class ProductController extends Controller
         return redirect()
             ->route('account.my-product')
             ->with('success', 'Tạo sản phẩm thành công!');
-    }
-
-    /**
-     * DELETE /account/product/{id}
-     */
-    public function destroy($id)
-    {
-        $product = Product::where('id_user', Auth::id())->findOrFail($id);
-        $product->delete();
-
-        return back()->with('success', 'Đã xóa sản phẩm.');
     }
 }
