@@ -65,29 +65,7 @@ class ProductController extends Controller
             mkdir($basePath, 0755, true);
         }
 
-        $filenames = [];
-
-        foreach ($files as $file) {
-            if (!$file || !$file->isValid()) {
-                continue;
-            }
-
-            $ext      = $file->getClientOriginalExtension();
-            $baseName = uniqid() . '_' . Str::random(6) . '.' . $ext;
-
-            $file->move($basePath, $baseName);
-            $fullPath = $basePath . '/' . $baseName;
-
-            Image::make($fullPath)
-                ->fit(85, 84)
-                ->save($basePath . '/85x84_' . $baseName);
-
-            Image::make($fullPath)
-                ->fit(329, 380)
-                ->save($basePath . '/329x380_' . $baseName);
-
-            $filenames[] = $baseName;
-        }
+        $filenames = $this->xuLyHinhAnh($files, $basePath);
 
         if (empty($filenames)) {
             return back()
@@ -103,6 +81,7 @@ class ProductController extends Controller
             ->route('account.my-product')
             ->with('success', 'Tạo sản phẩm thành công!');
     }
+
     // GET /account/edit-product
     public function edit($id)
     {
@@ -119,7 +98,7 @@ class ProductController extends Controller
     // POST /account/update-product
     public function update(ProductRequest $request, $id)
     {
-        $userId = Auth::id();
+        $userId  = Auth::id();
         $product = Product::where('id_user', $userId)->findOrFail($id);
 
         $data = $request->validated();
@@ -166,29 +145,10 @@ class ProductController extends Controller
             mkdir($basePath, 0755, true);
         }
 
-        foreach ($files as $file) {
-            if (!$file || !$file->isValid()) {
-                continue;
-            }
 
-            $ext      = $file->getClientOriginalExtension();
-            $baseName = uniqid() . '_' . Str::random(6) . '.' . $ext;
+        $newImages = $this->xuLyHinhAnh($files, $basePath);
 
-            $file->move($basePath, $baseName);
-            $fullPath = $basePath . '/' . $baseName;
-
-            Image::make($fullPath)
-                ->fit(85, 84)
-                ->save($basePath . '/85x84_' . $baseName);
-
-            Image::make($fullPath)
-                ->fit(329, 380)
-                ->save($basePath . '/329x380_' . $baseName);
-
-            $remain[] = $baseName;
-        }
-
-        $remain = array_values($remain);
+        $remain = array_values(array_merge($remain, $newImages));
 
         $data['image'] = json_encode($remain);
 
@@ -198,6 +158,23 @@ class ProductController extends Controller
             ->route('account.my-product')
             ->with('success', 'Cập nhật sản phẩm thành công!');
     }
+
+    // GET /account/product detail
+    public function show($id)
+    {
+
+        $product = Product::with(['brand', 'category', 'user'])->findOrFail($id);
+
+        $images = $product->images ?? [];
+
+        $recommended = Product::where('id', '<>', $product->id)
+            ->orderByDesc('created_at')
+            ->take(4)
+            ->get();
+
+        return view('frontend.product.detail', compact('product', 'images', 'recommended'));
+    }
+
 
     public function destroy($id)
     {
@@ -223,5 +200,34 @@ class ProductController extends Controller
 
         $product->delete();
         return back()->with('success', 'Đã xóa sản phẩm và hình ảnh liên quan.');
+    }
+
+    private function xuLyHinhAnh(array $files, string $basePath): array
+    {
+        $filenames = [];
+
+        foreach ($files as $file) {
+            if (!$file || !$file->isValid()) {
+                continue;
+            }
+
+            $ext      = $file->getClientOriginalExtension();
+            $baseName = uniqid() . '_' . Str::random(6) . '.' . $ext;
+
+            $file->move($basePath, $baseName);
+            $fullPath = $basePath . '/' . $baseName;
+
+            Image::make($fullPath)
+                ->fit(85, 84)
+                ->save($basePath . '/85x84_' . $baseName);
+
+            Image::make($fullPath)
+                ->fit(329, 380)
+                ->save($basePath . '/329x380_' . $baseName);
+
+            $filenames[] = $baseName;
+        }
+
+        return $filenames;
     }
 }

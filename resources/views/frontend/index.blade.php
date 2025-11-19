@@ -75,85 +75,106 @@
             </div>
 
             <div class="col-sm-9 padding-right">
+                {{-- SẢN PHẨM MỚI NHẤT --}}
                 <div class="features_items">
-                    <h2 class="title text-center">Sản phẩm nổi bật</h2>
+                    <h2 class="title text-center">Sản phẩm mới nhất</h2>
 
-                    {{-- Danh sách sản phẩm mẫu cố định --}}
-                    @for ($i = 1; $i <= 6; $i++)
-                        <div class="col-sm-4">
+                    @forelse($latestProducts as $p)
+                    @php
+                    $imgs = $p->images ?? [];
+                    $thumb = $imgs[0] ?? null;
+                    @endphp
+
+                    <div class="col-sm-4">
                         <div class="product-image-wrapper">
                             <div class="single-products">
                                 <div class="productinfo text-center">
-                                    <img src="{{ asset('frontend/images/home/product'.$i.'.jpg') }}" alt="Product {{ $i }}">
-                                    <h2>{{ number_format(299000 + $i*10000, 0, ',', '.') }} đ</h2>
-                                    <p>Sản phẩm demo {{ $i }}</p>
+
+                                    <a href="{{ route('product.detail', $p->id) }}">
+                                        @if($thumb)
+                                        <img src="{{ asset('upload/products/'.$p->id_user.'/329x380_'.$thumb) }}"
+                                            alt="{{ $p->name }}">
+                                        @else
+                                        <img src="{{ asset('frontend/images/no-image.png') }}" alt="No image">
+                                        @endif
+                                    </a>
+
+                                    <h2>{{ number_format($p->price, 0, ',', '.') }} $</h2>
+
+                                    <p>
+                                        <a href="{{ route('product.detail', $p->id) }}">
+                                            {{ $p->name }}
+                                        </a>
+                                    </p>
+
                                     <a href="#" class="btn btn-default add-to-cart">
                                         <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
                                     </a>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    @empty
+                    <p class="text-center">Chưa có sản phẩm nào.</p>
+                    @endforelse
+
+                    <div class="clearfix"></div>
                 </div>
-                @endfor
-            </div>
 
-            <div class="recommended_items">
-                <h2 class="title text-center">Bài viết mới nhất</h2>
+                {{-- BÀI VIẾT MỚI NHẤT --}}
+                <div class="recommended_items">
+                    <h2 class="title text-center">Bài viết mới nhất</h2>
 
-                <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="item active">
-                            <div class="col-sm-4">
-                                <div class="product-image-wrapper">
-                                    <div class="single-products">
-                                        <div class="productinfo text-center">
-                                            <img src="{{ asset('frontend/images/blog/blog-one.jpg') }}" alt="">
-                                            <h2>Tin bóng đá</h2>
-                                            <p>Cập nhật các tin thể thao nóng hổi.</p>
-                                            <a href="{{ route('blog.index') }}" class="btn btn-default add-to-cart">
-                                                <i class="fa fa-eye"></i> Đọc thêm
-                                            </a>
+                    <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            @if(isset($latestPosts) && count($latestPosts))
+                            @foreach($latestPosts->chunk(3) as $chunkIndex => $chunk)
+                            <div class="item {{ $chunkIndex === 0 ? 'active' : '' }}">
+                                @foreach($chunk as $post)
+                                <div class="col-sm-4">
+                                    <div class="product-image-wrapper">
+                                        <div class="single-products">
+                                            <div class="productinfo text-center">
+                                                @if(!empty($post->image))
+                                                <img src="{{ asset('upload/blog/'.$post->image) }}" alt="{{ $post->title }}">
+                                                @else
+                                                <img src="{{ asset('frontend/images/blog/blog-one.jpg') }}" alt="{{ $post->title }}">
+                                                @endif
+
+                                                <h2>{{ $post->title }}</h2>
+                                                <p>{{ \Illuminate\Support\Str::limit($post->description ?? $post->content ?? '', 60) }}</p>
+
+                                                <a href="{{ route('blog.show', ['id' => $post->id]) }}"
+                                                    class="btn btn-default add-to-cart">
+                                                    <i class="fa fa-eye"></i> Đọc thêm
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                @endforeach
                             </div>
-
-                            <div class="col-sm-4">
-                                <div class="product-image-wrapper">
-                                    <div class="single-products">
-                                        <div class="productinfo text-center">
-                                            <img src="{{ asset('frontend/images/blog/blog-two.jpg') }}" alt="">
-                                            <h2>Thời trang nữ</h2>
-                                            <p>Xu hướng thời trang mới nhất 2025.</p>
-                                            <a href="{{ route('blog.index') }}" class="btn btn-default add-to-cart">
-                                                <i class="fa fa-eye"></i> Đọc thêm
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                            @endforeach
+                            @else
+                            <div class="item active">
+                                <p class="text-center">Chưa có bài viết nào.</p>
                             </div>
-
-                            <div class="col-sm-4">
-                                <div class="product-image-wrapper">
-                                    <div class="single-products">
-                                        <div class="productinfo text-center">
-                                            <img src="{{ asset('frontend/images/blog/blog-three.jpg') }}" alt="">
-                                            <h2>Công nghệ mới</h2>
-                                            <p>Khám phá sản phẩm công nghệ nổi bật.</p>
-                                            <a href="{{ route('blog.index') }}" class="btn btn-default add-to-cart">
-                                                <i class="fa fa-eye"></i> Đọc thêm
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endif
                         </div>
+
+                        @if(isset($latestPosts) && count($latestPosts) > 3)
+                        <a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+                        <a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                        @endif
                     </div>
                 </div>
-            </div>
 
+            </div>
         </div>
-    </div>
     </div>
 </section>
 @endsection

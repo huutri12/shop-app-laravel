@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\MemberLoginRequest;
 use App\Http\Requests\MemberRegisterRequest;
+use App\Models\Blog;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -14,8 +16,16 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $latestPosts = \App\Models\Blog::latest()->take(6)->get();
-        return view('frontend.index', compact('latestPosts'));
+        $latestProducts = Product::orderByDesc('created_at')
+            ->take(6)
+            ->get();
+
+
+        $latestPosts = Blog::orderByDesc('created_at')
+            ->take(6)
+            ->get();
+
+        return view('frontend.index', compact('latestProducts', 'latestPosts'));
     }
     public function showLogin()
     {

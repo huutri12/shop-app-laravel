@@ -70,8 +70,12 @@ Route::middleware('auth')
         Route::get('/product/{id}/edit',    [ProductController::class, 'edit'])->name('edit-product');
         Route::post('/product/{id}/update', [ProductController::class, 'update'])->name('update-product');
         Route::delete('/product/{id}',      [ProductController::class, 'destroy'])->name('delete-product');
-        
     });
+
+// Trang chi tiết product (ai cũng xem được)
+Route::get('/product/{id}', [ProductController::class, 'show'])
+    ->whereNumber('id')
+    ->name('product.detail');
 
 Auth::routes();
 
