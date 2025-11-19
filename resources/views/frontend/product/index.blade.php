@@ -18,7 +18,7 @@
         <tr>
             <th>Id</th>
             <th>Name</th>
-            <th>Image(s)</th>
+            <th>Image</th>
             <th>Price</th>
             <th>Action</th>
         </tr>

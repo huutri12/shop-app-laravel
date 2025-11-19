@@ -103,4 +103,125 @@ class ProductController extends Controller
             ->route('account.my-product')
             ->with('success', 'Tạo sản phẩm thành công!');
     }
+    // GET /account/edit-product
+    public function edit($id)
+    {
+        $userId = Auth::id();
+
+        $product = Product::where('id_user', $userId)->findOrFail($id);
+
+        $categories = Category::where('status', 1)->orderBy('name')->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+
+        return view('frontend.product.edit', compact('product', 'categories', 'brands'));
+    }
+
+    // POST /account/update-product
+    public function update(ProductRequest $request, $id)
+    {
+        $userId = Auth::id();
+        $product = Product::where('id_user', $userId)->findOrFail($id);
+
+        $data = $request->validated();
+
+        if ((int)($data['status'] ?? 0) === 0) {
+            $data['sale'] = 0;
+        }
+
+        $oldImages = $product->images;
+        if (!is_array($oldImages)) {
+            $oldImages = [];
+        }
+
+        $remove = $request->input('remove_images', []);
+        if (!is_array($remove)) {
+            $remove = [];
+        }
+
+        $remain = array_values(array_diff($oldImages, $remove));
+
+        $files = $request->file('images', []);
+        if (!$files) {
+            $files = [];
+        }
+
+        if (count($remain) + count($files) > 3) {
+            return back()
+                ->withErrors(['images' => 'Tổng số hình (cũ còn lại + mới) không được quá 3.'])
+                ->withInput();
+        }
+
+        $basePath = public_path('upload/products/' . $userId);
+
+        foreach ($remove as $img) {
+            foreach (['', '85x84_', '329x380_'] as $prefix) {
+                $path = $basePath . '/' . $prefix . $img;
+                if (is_file($path)) {
+                    @unlink($path);
+                }
+            }
+        }
+
+        if (!is_dir($basePath)) {
+            mkdir($basePath, 0755, true);
+        }
+
+        foreach ($files as $file) {
+            if (!$file || !$file->isValid()) {
+                continue;
+            }
+
+            $ext      = $file->getClientOriginalExtension();
+            $baseName = uniqid() . '_' . Str::random(6) . '.' . $ext;
+
+            $file->move($basePath, $baseName);
+            $fullPath = $basePath . '/' . $baseName;
+
+            Image::make($fullPath)
+                ->fit(85, 84)
+                ->save($basePath . '/85x84_' . $baseName);
+
+            Image::make($fullPath)
+                ->fit(329, 380)
+                ->save($basePath . '/329x380_' . $baseName);
+
+            $remain[] = $baseName;
+        }
+
+        $remain = array_values($remain);
+
+        $data['image'] = json_encode($remain);
+
+        $product->update($data);
+
+        return redirect()
+            ->route('account.my-product')
+            ->with('success', 'Cập nhật sản phẩm thành công!');
+    }
+
+    public function destroy($id)
+    {
+        $product = Product::where('id_user', Auth::id())->findOrFail($id);
+
+        $images = $product->images ?? [];
+
+        $basePath = public_path('upload/products/' . Auth::id());
+
+        foreach ($images as $file) {
+
+            $origin = $basePath . '/' . $file;
+
+            $thumb  = $basePath . '/85x84_'   . $file;
+            $large  = $basePath . '/329x380_' . $file;
+
+            foreach ([$origin, $thumb, $large] as $path) {
+                if (is_file($path)) {
+                    @unlink($path);
+                }
+            }
+        }
+
+        $product->delete();
+        return back()->with('success', 'Đã xóa sản phẩm và hình ảnh liên quan.');
+    }
 }
