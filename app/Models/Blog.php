@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 
 class Blog extends Model
 {
+    use HasFactory;
     protected $table = 'blog';
 
     protected $fillable = ['title', 'slug', 'author', 'image', 'description', 'content'];
