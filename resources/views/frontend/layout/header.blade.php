@@ -61,8 +61,18 @@
 							<ul class="nav navbar-nav">
 								<li> <a href="{{ route('account.update') }}"><i class="fa fa-user"></i> Account</a></li>
 								<li><a href="#"><i class="fa fa-star"></i> Wishlist</a></li>
-								<li><a href="{{ url('checkout.html') }}"><i class="fa fa-crosshairs"></i> Checkout</a></li>
-								<li><a href="{{ url('cart.html') }}"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+								<li>
+									<a href="{{ route('checkout.index') }}">
+										<i class="fa fa-crosshairs"></i> Checkout
+									</a>
+								</li>
+								<li>
+									<a href="{{ route('cart.index') }}">
+										<i class="fa fa-shopping-cart"></i>
+										Cart (<span id="cart-count">{{ session('cart') ? collect(session('cart'))->sum('qty') : 0 }}</span>)
+									</a>
+								</li>
+
 
 								@auth
 								<li class="dropdown">

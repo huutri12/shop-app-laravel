@@ -17,7 +17,8 @@ use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
-
+use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CheckoutController;
 
 /* FRONTEND ROUTES (Member side) */
 
@@ -51,6 +52,20 @@ Route::prefix('blog')->name('blog.')->group(function () {
 
     Route::post('/comment', [BlogMemberController::class, 'comment'])->name('comment');
 });
+
+// CART (frontend)
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'delete'])->name('cart.delete');
+
+// CHECKOUT
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+// Đặt hàng – chỉ cho user đã login
+Route::post('/checkout/order', [CheckoutController::class, 'order'])
+    ->name('checkout.order');  
+
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 
 // Account (frontend)
 Route::middleware('auth')

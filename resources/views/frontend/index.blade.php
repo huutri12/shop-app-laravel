@@ -107,7 +107,7 @@
                                         </a>
                                     </p>
 
-                                    <a href="#" class="btn btn-default add-to-cart">
+                                    <a href="#" class="btn btn-default add-to-cart" data-id="{{ $p->id }}">
                                         <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
                                     </a>
                                 </div>

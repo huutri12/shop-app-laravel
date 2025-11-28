@@ -23,6 +23,9 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ asset('frontend/images/ico/apple-touch-icon-72-precomposed.png') }}">
     <link rel="apple-touch-icon-precomposed" href="{{ asset('frontend/images/ico/apple-touch-icon-57-precomposed.png') }}">
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     @stack('styles')
 </head>
 
@@ -69,6 +72,38 @@
     <script src="{{ asset('frontend/js/price-range.js') }}"></script>
     <script src="{{ asset('frontend/js/jquery.prettyPhoto.js') }}"></script>
     <script src="{{ asset('frontend/js/main.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $(document).on('click', '.add-to-cart', function(e) {
+                e.preventDefault();
+
+                let product_id = $(this).data('id');
+
+                let qtyInput = $(this).closest('.product-information').find('input[name="quantity"]');
+                let qty = qtyInput.length ? parseInt(qtyInput.val() || 1) : 1;
+
+                $.ajax({
+                    url: '{{ route("cart.add") }}',
+                    type: 'POST',
+                    data: {
+                        product_id: product_id,
+                        qty: qty,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            // update qty cart
+                            $('#cart-count').text(res.count);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                    }
+                })
+            })
+        })
+    </script>
     @stack('scripts')
 </body>
 

@@ -68,7 +68,9 @@
                                 <span>{{ number_format($product->price, 0, ',', '.') }} $</span>
                                 <label>Quantity:</label>
                                 <input type="number" value="1" min="1">
-                                <button type="button" class="btn btn-fefault cart">
+                                <button type="button"
+                                    class="btn btn-fefault cart add-to-cart"
+                                    data-id="{{ $product->id }}">
                                     <i class="fa fa-shopping-cart"></i>
                                     Add to cart
                                 </button>
