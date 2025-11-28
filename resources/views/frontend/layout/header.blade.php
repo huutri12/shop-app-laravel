@@ -139,8 +139,19 @@
 					</div>
 					<div class="col-sm-3">
 						<div class="search_box pull-right">
-							<input type="text" placeholder="Search" />
+							<form action="{{ route('product.search') }}" method="GET" style="display:flex;align-items:center;">
+								<input type="text"
+									name="keyword"
+									placeholder="Search"
+									value="{{ request('keyword') }}"
+									style="border-radius: 20px; padding: 5px 15px; width: 160px; margin-right:5px;">
+
+								<button type="submit" style="border:none;background:none;color:#FE980F;">
+
+								</button>
+							</form>
 						</div>
+
 					</div>
 				</div>
 			</div>

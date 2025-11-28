@@ -7,6 +7,7 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -229,5 +230,18 @@ class ProductController extends Controller
         }
 
         return $filenames;
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->keyword;
+
+        if (!$keyword) {
+            return redirect()->back() - with('error', 'Vui lòng nhập từ khóa tìm kiếm');
+        }
+
+        $products = Product::where('name', 'LIKE', "%{$keyword}%")->get();
+
+        return view('frontend.product.search', compact('products', 'keyword'));
     }
 }

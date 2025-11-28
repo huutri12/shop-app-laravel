@@ -63,9 +63,10 @@ Route::post('/cart/remove', [CartController::class, 'delete'])->name('cart.delet
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 // Đặt hàng – chỉ cho user đã login
 Route::post('/checkout/order', [CheckoutController::class, 'order'])
-    ->name('checkout.order');  
+    ->name('checkout.order');
 
-Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+// Search
+Route::get('/search', [ProductController::class, 'search'])->name('product.search');
 
 // Account (frontend)
 Route::middleware('auth')
