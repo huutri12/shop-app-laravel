@@ -252,4 +252,18 @@ class ProductController extends Controller
 
         return view('frontend.product.search', compact('products', 'keyword'));
     }
+
+    public function filterByPrice(Request $request)
+    {
+        $min = (int) $request->get('min', 0);
+        $max = (int) $request->get('max', 100000000);
+
+        $products = Product::query()
+            ->whereBetween('price', [$min, $max])
+            ->orderByDesc('id')
+            ->get();
+
+        
+        return view('frontend.product._items', compact('products'));
+    }
 }

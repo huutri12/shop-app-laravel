@@ -72,8 +72,13 @@ Route::get('/search', [ProductController::class, 'search'])->name('product.searc
 // Search Advanced
 Route::get('/search-advanced', [SearchController::class, 'index'])->name('search.advanced');
 
+// Search Price
+Route::get('/products/filter-by-price', [ProductController::class, 'filterByPrice'])
+    ->name('products.filter-price');
+
 // ListProduct
 Route::get('/products', [SearchController::class, 'index'])->name('products.list');
+
 
 // Account (frontend)
 Route::middleware('auth')

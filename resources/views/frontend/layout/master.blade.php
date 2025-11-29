@@ -18,20 +18,21 @@
     <link href="{{ asset('frontend/css/responsive.css') }}" rel="stylesheet">
 
     <link rel="shortcut icon" href="{{ asset('frontend/images/ico/favicon.ico') }}">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ asset('frontend/images/ico/apple-touch-icon-144-precomposed.png') }}">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ asset('frontend/images/ico/apple-touch-icon-114-precomposed.png') }}">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ asset('frontend/images/ico/apple-touch-icon-72-precomposed.png') }}">
-    <link rel="apple-touch-icon-precomposed" href="{{ asset('frontend/images/ico/apple-touch-icon-57-precomposed.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144"
+        href="{{ asset('frontend/images/ico/apple-touch-icon-144-precomposed.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114"
+        href="{{ asset('frontend/images/ico/apple-touch-icon-114-precomposed.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72"
+        href="{{ asset('frontend/images/ico/apple-touch-icon-72-precomposed.png') }}">
+    <link rel="apple-touch-icon-precomposed"
+        href="{{ asset('frontend/images/ico/apple-touch-icon-57-precomposed.png') }}">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
     @stack('styles')
 </head>
 
 <body>
-
-
     @include('frontend.layout.header')
 
     {{-- Slide chỉ hiển thị khi trang con định nghĩa section("slider") --}}
@@ -40,8 +41,8 @@
         @yield('slider')
     </section>
     @else
-    {{-- Nếu muốn slide luôn hiện, thay block này bằng:
-        @include('frontend.layout.slide') --}}
+    {{-- Nếu muốn slide luôn hiện, bỏ comment dưới này --}}
+    {{-- @include('frontend.layout.slide') --}}
     @endif
 
     <section>
@@ -53,8 +54,8 @@
                     @yield('menu_left')
                 </div>
                 @else
-                {{-- Nếu muốn slide luôn hiện, thay block này bằng:
-                 @include('frontend.layout.menu_left') --}}
+                {{-- Nếu muốn menu trái luôn hiện, bỏ comment dưới này --}}
+                {{-- <div class="col-sm-3">@include('frontend.layout.menu_left')</div> --}}
                 @endif
 
                 <div class="col-sm-9">
@@ -64,6 +65,7 @@
             </div>
         </div>
     </section>
+
     @include('frontend.layout.footer')
 
     <script src="{{ asset('frontend/js/jquery.js') }}"></script>
@@ -73,13 +75,61 @@
     <script src="{{ asset('frontend/js/jquery.prettyPhoto.js') }}"></script>
     <script src="{{ asset('frontend/js/main.js') }}"></script>
 
+    {{-- Lọc sản phẩm theo khoảng giá với slider bên trái --}}
+    <script>
+        $(function() {
+            // nếu trang hiện tại không có slider #sl2 thì thôi
+            if (!$('#sl2').length) return;
+
+            var $slider = $('#sl2').slider();
+
+            var initVal = $slider.data('slider').getValue(); // [min,max]
+            $('#price-min-label').text(initVal[0]);
+            $('#price-max-label').text(initVal[1]);
+
+            $slider.on('slideStop', function(ev) {
+                var vals = ev.value; // [min,max]
+                var min = vals[0];
+                var max = vals[1];
+
+                $('#price-min-label').text(min);
+                $('#price-max-label').text(max);
+
+                filterProductsByPrice(min, max);
+            });
+
+            function filterProductsByPrice(min, max) {
+                $.ajax({
+                    url: "{{ route('products.filter-price') }}",
+                    type: "GET",
+                    data: {
+                        min: min,
+                        max: max
+                    },
+                    beforeSend: function() {
+                        $('#product-list').css('opacity', .5);
+                    },
+                    success: function(html) {
+                        $('#product-list').html(html);
+                    },
+                    complete: function() {
+                        $('#product-list').css('opacity', 1);
+                    },
+                    error: function() {
+                        alert('Có lỗi khi lọc sản phẩm theo giá.');
+                    }
+                });
+            }
+        });
+    </script>
+
+    {{-- Ajax add to cart --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             $(document).on('click', '.add-to-cart', function(e) {
                 e.preventDefault();
 
                 let product_id = $(this).data('id');
-
                 let qtyInput = $(this).closest('.product-information').find('input[name="quantity"]');
                 let qty = qtyInput.length ? parseInt(qtyInput.val() || 1) : 1;
 
@@ -93,17 +143,17 @@
                     },
                     success: function(res) {
                         if (res.success) {
-                            // update qty cart
                             $('#cart-count').text(res.count);
                         }
                     },
                     error: function(xhr) {
                         console.log(xhr.responseText);
                     }
-                })
-            })
-        })
+                });
+            });
+        });
     </script>
+
     @stack('scripts')
 </body>
 

@@ -10,7 +10,7 @@ use App\Models\Brand;
 
 class SearchController extends Controller
 {
-    // Hiển thị form + xử lý search luôn (method GET)
+
     public function index(Request $request)
     {
         $q = Product::query();
@@ -38,17 +38,14 @@ class SearchController extends Controller
             }
         }
 
-        // category
         if ($request->filled('category_id')) {
             $q->where('category_id', $request->category_id);
         }
 
-        // brand
         if ($request->filled('brand_id')) {
             $q->where('brand_id', $request->brand_id);
         }
 
-        // status
         if ($request->filled('status')) {
             $q->where('status', $request->status);
         }
