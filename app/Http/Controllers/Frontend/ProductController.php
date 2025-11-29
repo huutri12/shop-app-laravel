@@ -26,6 +26,14 @@ class ProductController extends Controller
         return view('frontend.product.index', compact('products'));
     }
 
+    // GET/list-product
+    public function list()
+    {
+        $products = Product::orderByDesc('id')   // mới nhất trước
+            ->paginate(6);
+        return view('frontend.product.list', compact('products'));
+    }
+
     // GET /account/add-product
     public function create()
     {

@@ -143,7 +143,7 @@
                                                     <img src="{{ asset('frontend/images/no-image.png') }}" alt="">
                                                     @endif
                                                 </a>
-                                                <h2>{{ number_format($r->price,0,',','.') }} VND</h2>
+                                                <h2>{{ number_format($r->price,0,',','.') }} $</h2>
                                                 <p>{{ \Illuminate\Support\Str::limit($r->name, 40) }}</p>
                                                 <a href="{{ route('product.detail',$r->id) }}"
                                                     class="btn btn-default add-to-cart">

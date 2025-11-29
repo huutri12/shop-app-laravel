@@ -8,7 +8,9 @@ use App\Http\Controllers\Frontend\MemberController;
 use App\Http\Controllers\Frontend\BlogMemberController;
 use App\Http\Controllers\Frontend\AccountController;
 use App\Http\Controllers\Frontend\ProductController;
-
+use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\SearchController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\DashboardController;
@@ -17,8 +19,7 @@ use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\Frontend\CartController;
-use App\Http\Controllers\Frontend\CheckoutController;
+
 
 /* FRONTEND ROUTES (Member side) */
 
@@ -68,6 +69,12 @@ Route::post('/checkout/order', [CheckoutController::class, 'order'])
 // Search
 Route::get('/search', [ProductController::class, 'search'])->name('product.search');
 
+// Search Advanced
+Route::get('/search-advanced', [SearchController::class, 'index'])->name('search.advanced');
+
+// ListProduct
+Route::get('/products', [SearchController::class, 'index'])->name('products.list');
+
 // Account (frontend)
 Route::middleware('auth')
     ->prefix('account')
@@ -99,7 +106,6 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 /* ADMIN ROUTES (Admin Panel) */
-
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
