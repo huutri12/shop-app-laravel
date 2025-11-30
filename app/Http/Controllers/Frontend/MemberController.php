@@ -34,19 +34,26 @@ class MemberController extends Controller
 
     public function login(MemberLoginRequest $request)
     {
-        $login = [
+        $credentials = [
             'email'    => $request->email,
             'password' => $request->password,
-            'level'    => User::LEVEL_MEMBER,
         ];
 
         $remember = $request->boolean('remember_me');
 
-        if (Auth::attempt($login, $remember)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+            $user = Auth::user();
 
-            return redirect()->to('/')
-                ->with('success', 'Đăng nhập thành công, xin chào ' . auth()->user()->name . '!');
+            // Nếu là admin -> vao admin dashboard
+            if ($user->level == User::LEVEL_ADMIN) {
+                return redirect()->route('admin.dashboard')
+                    ->with('success', 'Xin chào admin ' . $user->name);
+            }
+
+            // Nếu là member -> về trang chủ frontend
+            return redirect()->route('home')
+                ->with('success', 'Đăng nhập thành công, xin chào ' . $user->name . '!');
         }
 
         return back()

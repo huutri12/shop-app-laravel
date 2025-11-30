@@ -25,7 +25,6 @@ use App\Http\Controllers\Admin\{
     CategoryController,
     BrandController,
     HistoryController,
-    OrderController
 };
 
 /*
@@ -119,14 +118,12 @@ Route::middleware(['auth', 'member'])
         Route::delete('/product/{id}',      [ProductController::class, 'destroy'])->name('delete-product');
     });
 
+
+
 // Chi tiết product (public)
 Route::get('/product/{id}', [ProductController::class, 'show'])
     ->whereNumber('id')
     ->name('product.detail');
-
-// Auth mặc định (nếu bạn vẫn dùng)
-Auth::routes();
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------

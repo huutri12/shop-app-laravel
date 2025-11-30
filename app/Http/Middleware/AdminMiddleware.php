@@ -26,7 +26,7 @@ class AdminMiddleware
             ->withErrors('Vui long dang nhap de tiep tuc');
         }
 
-        return redirect()->route('member.login')
+        return redirect()->route('home')
         ->withErrors('Ban khong co quyen truy cap khu vuc quan tri');
     }
 }
