@@ -3,93 +3,109 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * PROFILE của admin (chính tài khoản đang đăng nhập)
      */
     public function profile()
     {
         $user = Auth::user();
-        $countries = DB::table('countries')->select('id', 'name')->orderBy('name')->get();
+        $countries = DB::table('countries')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
         return view('admin.user.profile', compact('user', 'countries'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Cập nhật PROFILE của admin đang đăng nhập
      */
-    public function create()
+    public function updateProfile(UpdateProfileRequest $request)
     {
-        //
-    }
+        $user = Auth::user(); // hoặc User::findOrFail(Auth::id());
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $data = $request->only(['name', 'email']);
+        $file = $request->file('avatar');
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        return redirect()->route('admin.profile.edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateProfileRequest $request)
-    {
-        $userId = Auth::id();
-        $user = User::findOrFail($userId);
-
-        $data = $request->all();
-        $file = $request->avatar;
-
-        if (!empty($file)) {
+        if ($file) {
             $data['avatar'] = $file->getClientOriginalName();
         }
 
-        if ($data['password']) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            $data['password']  = $user->password;
-        }
-
         if ($user->update($data)) {
-            if (!empty($file)) {
+            if ($file) {
                 $file->move('upload/user/avatar', $file->getClientOriginalName());
             }
-            return redirect()->back()->with('success', __('Update profile success.'));
-        } else {
-            return redirect()->back()->withErrors('Update profile error.');
+
+            return back()->with('success', 'Update profile success.');
         }
+
+        return back()->withErrors('Update profile error.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * LIST USER cho admin
+     */
+    public function index()
+    {
+        $users = User::orderBy('id')->paginate(15);
+
+        return view('admin.user.index', compact('users'));
+    }
+
+    /**
+     * FORM EDIT một user bất kỳ (admin dùng)
+     */
+    public function edit(string $id)
+    {
+        $user = User::findOrFail($id);
+
+        return view('admin.user.edit', compact('user'));
+    }
+
+    /**
+     * UPDATE một user bất kỳ (admin dùng)
+     */
+    public function updateUser(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'level' => 'required|in:0,1',
+        ]);
+
+        $data = $request->only(['name', 'email', 'level']);
+
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Cập nhật user thành công.');
+    }
+
+    /**
+     * DELETE user
      */
     public function destroy(string $id)
     {
-        //
+        User::destroy($id);
+
+        return back()->with('success', 'Xóa user thành công.');
     }
 }

@@ -17,12 +17,15 @@ use App\Http\Controllers\Frontend\{
 
 // Admin Controllers
 use App\Http\Controllers\Admin\{
+    AdminProductController,
     DashboardController,
     UserController,
     CountryController,
     BlogController,
     CategoryController,
-    BrandController
+    BrandController,
+    HistoryController,
+    OrderController
 };
 
 /*
@@ -132,14 +135,42 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 */
 
 Route::middleware(['auth', 'admin'])
+
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
+        // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        // PROFILE admin (chính tài khoản đang đăng nhập)
         Route::get('/profile', [UserController::class, 'profile'])->name('profile.edit');
         Route::post('/profile', [UserController::class, 'update'])->name('profile.update');
+
+        // USERS – quản lý tất cả user
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::post('/users/{id}/update', [UserController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.delete');
+
+        // Product - quản lý product
+        Route::prefix('products')->name('products.')->group(function () {
+            Route::get('/', [AdminProductController::class, 'index'])
+                ->name('index');
+
+            Route::get('/edit/{id}', [AdminProductController::class, 'edit'])
+                ->name('edit');
+
+            Route::post('/update/{id}', [AdminProductController::class, 'update'])
+                ->name('update');
+
+            Route::delete('/delete/{id}', [AdminProductController::class, 'destroy'])
+                ->name('delete');
+        });
+
+        // History - Quản lý lich sử thông tin mua hàng
+        Route::get('/history', [HistoryController::class, 'index'])
+            ->name('history.index');
 
         // Country
         Route::prefix('country')->name('country.')->group(function () {

@@ -42,11 +42,24 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="starter-kit.html" aria-expanded="false">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.users.index') }}" aria-expanded="false">
                                 <i class="mdi mdi-file"></i>
-                                <span class="hide-menu">Blank</span>
+                                <span class="hide-menu">List User</span>
                             </a>
                         </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.products.index') }}">
+                                <i class="mdi mdi-package-variant-closed"></i>
+                                <span>List Product</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ route('admin.history.index') }}" class="sidebar-link">
+                                <i class="mdi mdi-history"></i>
+                                <span>History</span>
+                            </a>
+                        </li>
+
                         <li class="sidebar-item">
                             <a class="sidebar-link waves-effect waves-dark sidebar-link" href="error-404.html" aria-expanded="false">
                                 <i class="mdi mdi-alert-outline"></i>

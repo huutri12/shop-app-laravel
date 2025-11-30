@@ -13,4 +13,9 @@ class History extends Model
         'id_user',
         'price'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }
